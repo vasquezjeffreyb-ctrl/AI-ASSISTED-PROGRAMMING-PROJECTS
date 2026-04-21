@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>P-M Interaction Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        h1 { color: #333; }
+        form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); max-width: 400px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 15px; padding: 10px; background: #0078d7; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005fa3; }
+        .result { margin-top: 30px; padding: 20px; background: #e9f5e9; border: 1px solid #c3e6c3; border-radius: 8px; }
+        .unsafe { background: #fbe9e9; border: 1px solid #f5c2c2; }
+        img { margin-top: 20px; max-width: 500px; border: 1px solid #ccc; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>P-M Interaction Tool</h1>
+    <form method="POST">
+        <label>Width b (mm)</label>
+        <input type="number" step="0.01" name="b" required>
+        <label>Height h (mm)</label>
+        <input type="number" step="0.01" name="h" required>
+        <label>Concrete strength fc (MPa)</label>
+        <input type="number" step="0.01" name="fc" required>
+        <label>Steel yield strength fy (MPa)</label>
+        <input type="number" step="0.01" name="fy" required>
+        <label>Axial Load Pu (kN)</label>
+        <input type="number" step="0.01" name="Pu" required>
+        <label>Moment Mu (kN·m)</label>
+        <input type="number" step="0.01" name="Mu" required>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if result %}
+    <div class="result {% if result.status == 'UNSAFE' %}unsafe{% endif %}">
+        <h2>Results</h2>
+        <p><strong>φPn:</strong> {{ result.phiPn }} kN</p>
+        <p><strong>φMn:</strong> {{ result.phiMn }} kN·m</p>
+        <p><strong>Status:</strong> {{ result.status }}</p>
+        <img src="{{ url_for('static', filename='diagram.png') }}" alt="Interaction Diagram">
+    </div>
+    {% endif %}
+</body>
+</html>
