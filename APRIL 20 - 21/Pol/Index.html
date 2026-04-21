@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSCP 2015 — Edge Isolated Footing Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS & RESET
+   ============================================================ */
+:root {
+  --bg:          #0d0f13;
+  --bg2:         #131620;
+  --bg3:         #191d28;
+  --bg4:         #1e2330;
+  --border:      #2a2f3e;
+  --border2:     #353b50;
+  --accent:      #4f8ef7;
+  --accent2:     #2563c4;
+  --green:       #22c97a;
+  --green-bg:    #0d2b1e;
+  --red:         #f25c5c;
+  --red-bg:      #2b0e0e;
+  --amber:       #f5a623;
+  --amber-bg:    #2b1e0a;
+  --text:        #e8ecf4;
+  --text2:       #9aa3b8;
+  --text3:       #5c6478;
+  --mono:        'IBM Plex Mono', 'Courier New', monospace;
+  --sans:        'IBM Plex Sans', system-ui, sans-serif;
+  --r:           6px;
+  --r2:          10px;
+  --shadow:      0 4px 24px rgba(0,0,0,0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-logo {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.header-logo svg { width: 18px; height: 18px; fill: white; }
+.header-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.header-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--mono);
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--r);
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.btn:hover { background: var(--bg4); color: var(--text); border-color: var(--accent); }
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: white; }
+.unit-toggle {
+  display: flex;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.unit-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background: var(--bg3);
+  color: var(--text3);
+  transition: all 0.15s;
+}
+.unit-btn.active { background: var(--accent); color: white; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+.panel-left {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px;
+}
+.panel-right {
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* ============================================================
+   INPUT PANEL
+   ============================================================ */
+.section {
+  margin-bottom: 20px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.section-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.field {
+  display: grid;
+  grid-template-columns: 1fr 90px 50px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.field label {
+  font-size: 12px;
+  color: var(--text2);
+  font-family: var(--mono);
+}
+.field input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 10px;
+  text-align: right;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.field input::-webkit-outer-spin-button,
+.field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.field input:focus { outline: none; border-color: var(--accent); background: var(--bg4); }
+.field .unit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  text-align: left;
+}
+.phi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.phi-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.phi-label { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.phi-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); }
+
+/* ============================================================
+   RESULTS PANEL
+   ============================================================ */
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.results-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.status-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+}
+.status-ok   { background: var(--green-bg); color: var(--green); border: 1px solid #1a5e3a; }
+.status-fail { background: var(--red-bg);   color: var(--red);   border: 1px solid #6b1a1a; }
+.status-warn { background: var(--amber-bg); color: var(--amber); border: 1px solid #5e3a0a; }
+
+/* Metric cards */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.metric {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+.metric-val {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+}
+.metric-lbl {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Check rows */
+.checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.check {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.check-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.check-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+.check-demand { font-family: var(--mono); font-size: 12px; color: var(--text2); }
+.check-cap    { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+.check-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.08em;
+}
+.badge-pass { background: var(--green-bg); color: var(--green); }
+.badge-fail { background: var(--red-bg);   color: var(--red); }
+.badge-warn { background: var(--amber-bg); color: var(--amber); }
+.check-ratio {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+}
+
+/* Ratio bar */
+.ratio-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.ratio-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s;
+}
+
+/* Data table */
+.data-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.data-block-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 8px 14px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table td {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table .dk { font-family: var(--mono); color: var(--text3); width: 55%; }
+.data-table .dv { font-family: var(--mono); font-weight: 500; color: var(--text); text-align: right; }
+.data-table .dv.hi { color: var(--accent); }
+.data-table .dv.warn { color: var(--amber); }
+.data-table .dv.bad  { color: var(--red); }
+.data-table .eq {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  padding-top: 0;
+  padding-bottom: 6px;
+}
+
+/* Rebar */
+.rebar-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.rebar-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 12px 14px;
+}
+.rebar-dir {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rebar-dir::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--green);
+}
+.rebar-main {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.rebar-detail {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.7;
+}
+.rebar-detail span { color: var(--text2); }
+
+/* Canvas areas */
+.canvas-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.canvas-block-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 8px 14px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.canvas-inner { padding: 16px; }
+canvas { display: block; width: 100%; border-radius: 4px; }
+
+/* Warning box */
+.warning-box {
+  background: var(--red-bg);
+  border: 1px solid #6b1a1a;
+  border-radius: var(--r2);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--red);
+  display: none;
+}
+.warning-box.show { display: block; }
+.warning-box strong { display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* Print */
+@media print {
+  .header-actions, .unit-toggle { display: none; }
+  .layout { display: block; }
+  .panel-left, .panel-right { overflow: visible; height: auto; border: none; }
+  body { background: white; color: black; }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; height: auto; }
+  .panel-left, .panel-right { height: auto; overflow: visible; }
+  .checks { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">
+      <svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zM3 5v6l3-3 3 3 3-3 3 3 3-3v-6H3z"/></svg>
+    </div>
+    <div>
+      <div class="header-title">NSCP 2015 — Isolated Edge Footing Designer</div>
+      <div class="header-sub">Column at Edge · LRFD · Ultimate Strength Design</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="unit-toggle">
+      <button class="unit-btn active" id="btn-si"  onclick="setUnits('SI')">SI (kN/m)</button>
+      <button class="unit-btn"       id="btn-imp" onclick="setUnits('IMP')">Imperial</button>
+    </div>
+    <button class="btn" onclick="window.print()">⎙ Print</button>
+    <button class="btn btn-primary" onclick="exportPDF()">↓ Export PDF</button>
+  </div>
+</header>
+
+<!-- ============================================================
+     MAIN LAYOUT
+     ============================================================ -->
+<div class="layout">
+
+  <!-- LEFT: INPUTS -->
+  <div class="panel-left">
+
+    <!-- GEOMETRY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">Column Geometry</span>
+      </div>
+      <div class="field">
+        <label>Column width b<sub>c</sub></label>
+        <input type="number" id="bc" value="0.35" step="0.05" min="0.1">
+        <span class="unit" id="u-m1">m</span>
+      </div>
+      <div class="field">
+        <label>Column length d<sub>c</sub></label>
+        <input type="number" id="dc" value="0.35" step="0.05" min="0.1">
+        <span class="unit" id="u-m2">m</span>
+      </div>
+      <div class="field">
+        <label>Edge distance</label>
+        <input type="number" id="edgedist" value="0.00" step="0.05" min="0">
+        <span class="unit" id="u-m3">m</span>
+      </div>
+    </div>
+
+    <!-- LOADS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">Applied Loads</span>
+      </div>
+      <div class="field">
+        <label>Dead Load DL</label>
+        <input type="number" id="DL" value="500" step="10" min="0">
+        <span class="unit" id="u-kn1">kN</span>
+      </div>
+      <div class="field">
+        <label>Live Load LL</label>
+        <input type="number" id="LL" value="350" step="10" min="0">
+        <span class="unit" id="u-kn2">kN</span>
+      </div>
+      <div class="field">
+        <label>Moment M (about edge)</label>
+        <input type="number" id="M" value="85" step="5" min="0">
+        <span class="unit" id="u-knm">kN·m</span>
+      </div>
+    </div>
+
+    <!-- SOIL -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">Soil Parameters</span>
+      </div>
+      <div class="field">
+        <label>Allowable q<sub>a</sub></label>
+        <input type="number" id="qa" value="150" step="5" min="10">
+        <span class="unit" id="u-kpa">kPa</span>
+      </div>
+      <div class="field">
+        <label>Unit weight γ<sub>s</sub></label>
+        <input type="number" id="gs" value="18" step="0.5" min="10">
+        <span class="unit" id="u-kn3">kN/m³</span>
+      </div>
+      <div class="field">
+        <label>Depth of footing D<sub>f</sub></label>
+        <input type="number" id="Df" value="1.5" step="0.1" min="0.5">
+        <span class="unit" id="u-m4">m</span>
+      </div>
+      <div class="field">
+        <label>Unit weight γ<sub>c</sub></label>
+        <input type="number" id="gc" value="24" step="0.5" min="20">
+        <span class="unit" id="u-kn4">kN/m³</span>
+      </div>
+    </div>
+
+    <!-- MATERIAL -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">Material Properties</span>
+      </div>
+      <div class="field">
+        <label>Concrete f'<sub>c</sub></label>
+        <input type="number" id="fc" value="28" step="1" min="21">
+        <span class="unit">MPa</span>
+      </div>
+      <div class="field">
+        <label>Steel f<sub>y</sub></label>
+        <input type="number" id="fy" value="415" step="5" min="230">
+        <span class="unit">MPa</span>
+      </div>
+      <div class="field">
+        <label>Cover (clear)</label>
+        <input type="number" id="cover" value="75" step="5" min="40">
+        <span class="unit">mm</span>
+      </div>
+      <div class="field">
+        <label>Bar diameter φ</label>
+        <input type="number" id="bardia" value="20" step="2" min="10">
+        <span class="unit">mm</span>
+      </div>
+    </div>
+
+    <!-- DIMENSIONS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">Footing Dimensions</span>
+      </div>
+      <div class="field">
+        <label>Footing thickness h</label>
+        <input type="number" id="thick" value="500" step="25" min="200">
+        <span class="unit">mm</span>
+      </div>
+      <div class="field">
+        <label>Override B (width)</label>
+        <input type="number" id="overrideB" value="" step="0.1" min="0" placeholder="auto">
+        <span class="unit" id="u-m5">m</span>
+      </div>
+      <div class="field">
+        <label>Override L (length)</label>
+        <input type="number" id="overrideL" value="" step="0.1" min="0" placeholder="auto">
+        <span class="unit" id="u-m6">m</span>
+      </div>
+    </div>
+
+    <!-- PHI FACTORS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">φ Reduction Factors (NSCP 2015)</span>
+      </div>
+      <div class="phi-grid">
+        <div class="phi-item"><span class="phi-label">φ Flexure</span><span class="phi-val" id="phi-f-disp">0.90</span></div>
+        <div class="phi-item"><span class="phi-label">φ Shear</span><span class="phi-val" id="phi-s-disp">0.75</span></div>
+        <div class="phi-item"><span class="phi-label">γ<sub>DL</sub></span><span class="phi-val">1.20</span></div>
+        <div class="phi-item"><span class="phi-label">γ<sub>LL</sub></span><span class="phi-val">1.60</span></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+  <!-- RIGHT: RESULTS -->
+  <div class="panel-right" id="results-panel">
+
+    <div class="results-header">
+      <span class="results-title">Design Results</span>
+      <span class="status-badge" id="overall-status">—</span>
+    </div>
+
+    <!-- Warning box -->
+    <div class="warning-box" id="warning-box">
+      <strong>⚠ Design Warnings</strong>
+      <div id="warning-text"></div>
+    </div>
+
+    <!-- Key metrics -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val" id="m-dims">—</div>
+        <div class="metric-lbl">B × L (m)</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-qmax">—</div>
+        <div class="metric-lbl">q<sub>max</sub> (kPa)</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-pu">—</div>
+        <div class="metric-lbl">P<sub>u</sub> (kN)</div>
+      </div>
+    </div>
+
+    <!-- Pass/Fail checks -->
+    <div class="checks">
+      <div class="check" id="chk-bearing">
+        <div class="check-name">Bearing Capacity</div>
+        <div class="check-row">
+          <span class="check-demand" id="chk-bearing-d">—</span>
+          <span class="check-badge" id="chk-bearing-b">—</span>
+        </div>
+        <div class="check-ratio" id="chk-bearing-r"></div>
+        <div class="ratio-bar"><div class="ratio-fill" id="chk-bearing-bar" style="width:0%"></div></div>
+      </div>
+      <div class="check" id="chk-tension">
+        <div class="check-name">No Tension (q<sub>min</sub> ≥ 0)</div>
+        <div class="check-row">
+          <span class="check-demand" id="chk-tension-d">—</span>
+          <span class="check-badge" id="chk-tension-b">—</span>
+        </div>
+        <div class="check-ratio" id="chk-tension-r"></div>
+        <div class="ratio-bar"><div class="ratio-fill" id="chk-tension-bar" style="width:0%"></div></div>
+      </div>
+      <div class="check" id="chk-punch">
+        <div class="check-name">Two-Way Punching Shear</div>
+        <div class="check-row">
+          <span class="check-demand" id="chk-punch-d">—</span>
+          <span class="check-badge" id="chk-punch-b">—</span>
+        </div>
+        <div class="check-ratio" id="chk-punch-r"></div>
+        <div class="ratio-bar"><div class="ratio-fill" id="chk-punch-bar" style="width:0%"></div></div>
+      </div>
+      <div class="check" id="chk-shear1">
+        <div class="check-name">One-Way Beam Shear</div>
+        <div class="check-row">
+          <span class="check-demand" id="chk-shear1-d">—</span>
+          <span class="check-badge" id="chk-shear1-b">—</span>
+        </div>
+        <div class="check-ratio" id="chk-shear1-r"></div>
+        <div class="ratio-bar"><div class="ratio-fill" id="chk-shear1-bar" style="width:0%"></div></div>
+      </div>
+      <div class="check" id="chk-devlen">
+        <div class="check-name">Development Length</div>
+        <div class="check-row">
+          <span class="check-demand" id="chk-devlen-d">—</span>
+          <span class="check-badge" id="chk-devlen-b">—</span>
+        </div>
+        <div class="check-ratio" id="chk-devlen-r"></div>
+        <div class="ratio-bar"><div class="ratio-fill" id="chk-devlen-bar" style="width:0%"></div></div>
+      </div>
+      <div class="check" id="chk-kern">
+        <div class="check-name">Kern (e ≤ L/6)</div>
+        <div class="check-row">
+          <span class="check-demand" id="chk-kern-d">—</span>
+          <span class="check-badge" id="chk-kern-b">—</span>
+        </div>
+        <div class="check-ratio" id="chk-kern-r"></div>
+        <div class="ratio-bar"><div class="ratio-fill" id="chk-kern-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Analysis summary -->
+    <div class="data-block">
+      <div class="data-block-title">Load Analysis</div>
+      <table class="data-table">
+        <tr><td class="dk">Service Load P = DL + LL</td><td class="dv hi" id="r-Ps">—</td></tr>
+        <tr><td class="eq" colspan="2">P<sub>u</sub> = 1.2·DL + 1.6·LL &nbsp;[NSCP 2015 Sec. 405]</td></tr>
+        <tr><td class="dk">Factored Load P<sub>u</sub></td><td class="dv hi" id="r-Pu">—</td></tr>
+        <tr><td class="dk">Factored Moment M<sub>u</sub></td><td class="dv" id="r-Mu">—</td></tr>
+        <tr><td class="dk">Eccentricity e = M<sub>u</sub>/P<sub>u</sub></td><td class="dv" id="r-ecc">—</td></tr>
+        <tr><td class="dk">Kern limit L/6</td><td class="dv" id="r-kern">—</td></tr>
+        <tr><td class="dk">Net allowable q<sub>net</sub></td><td class="dv" id="r-qnet">—</td></tr>
+        <tr><td class="dk">Required area A<sub>req</sub></td><td class="dv" id="r-Areq">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Footing dimensions -->
+    <div class="data-block">
+      <div class="data-block-title">Footing Geometry</div>
+      <table class="data-table">
+        <tr><td class="dk">Width B</td><td class="dv hi" id="r-B">—</td></tr>
+        <tr><td class="dk">Length L</td><td class="dv hi" id="r-L">—</td></tr>
+        <tr><td class="dk">Thickness h</td><td class="dv" id="r-h">—</td></tr>
+        <tr><td class="dk">Effective depth d</td><td class="dv" id="r-d">—</td></tr>
+        <tr><td class="dk">Gross area A</td><td class="dv" id="r-A">—</td></tr>
+        <tr><td class="dk">Section modulus S = BL²/6</td><td class="dv" id="r-S">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Soil pressure -->
+    <div class="data-block">
+      <div class="data-block-title">Soil Pressure Analysis</div>
+      <table class="data-table">
+        <tr><td class="eq" colspan="2">q = P<sub>u</sub>/A ± M<sub>u</sub>/S &nbsp;[NSCP 2015 Sec. 418]</td></tr>
+        <tr><td class="dk">q<sub>max</sub></td><td class="dv" id="r-qmax">—</td></tr>
+        <tr><td class="dk">q<sub>min</sub></td><td class="dv" id="r-qmin">—</td></tr>
+        <tr><td class="dk">q<sub>allow</sub></td><td class="dv" id="r-qa">—</td></tr>
+        <tr><td class="dk">Pressure type</td><td class="dv" id="r-ptype">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Shear -->
+    <div class="data-block">
+      <div class="data-block-title">Shear Design</div>
+      <table class="data-table">
+        <tr><td class="eq" colspan="2">Two-way: φV<sub>c</sub> = φ·(1/3)·√f'<sub>c</sub>·b<sub>o</sub>·d &nbsp;[NSCP 2015 Sec. 422.6]</td></tr>
+        <tr><td class="dk">Critical perimeter b<sub>o</sub></td><td class="dv" id="r-bo">—</td></tr>
+        <tr><td class="dk">V<sub>u2</sub> (punching demand)</td><td class="dv" id="r-Vu2">—</td></tr>
+        <tr><td class="dk">φV<sub>c2</sub> (punching capacity)</td><td class="dv" id="r-Vc2">—</td></tr>
+        <tr><td class="eq" colspan="2">One-way: φV<sub>c</sub> = φ·(1/6)·√f'<sub>c</sub>·B·d &nbsp;[NSCP 2015 Sec. 422.5]</td></tr>
+        <tr><td class="dk">Critical dist. from col. face</td><td class="dv" id="r-x1way">—</td></tr>
+        <tr><td class="dk">V<sub>u1</sub> (beam shear demand)</td><td class="dv" id="r-Vu1">—</td></tr>
+        <tr><td class="dk">φV<sub>c1</sub> (beam shear capacity)</td><td class="dv" id="r-Vc1">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Flexure -->
+    <div class="data-block">
+      <div class="data-block-title">Flexural Design</div>
+      <table class="data-table">
+        <tr><td class="eq" colspan="2">M<sub>u</sub> at face of column: critical section at c/l of edge to col. face</td></tr>
+        <tr><td class="dk">M<sub>u</sub> (L-direction)</td><td class="dv hi" id="r-MuL">—</td></tr>
+        <tr><td class="dk">M<sub>u</sub> (B-direction)</td><td class="dv" id="r-MuB">—</td></tr>
+        <tr><td class="dk">R<sub>n</sub> = M<sub>u</sub>/(φ·B·d²)</td><td class="dv" id="r-Rn">—</td></tr>
+        <tr><td class="dk">ρ required</td><td class="dv" id="r-rho">—</td></tr>
+        <tr><td class="dk">ρ<sub>min</sub> = max(1.4/f<sub>y</sub>, 0.25√f'<sub>c</sub>/f<sub>y</sub>)</td><td class="dv" id="r-rhomin">—</td></tr>
+        <tr><td class="dk">ρ used (governs)</td><td class="dv hi" id="r-rhogov">—</td></tr>
+        <tr><td class="dk">A<sub>s</sub> required (L-dir)</td><td class="dv hi" id="r-AsL">—</td></tr>
+        <tr><td class="dk">A<sub>s</sub> required (B-dir)</td><td class="dv" id="r-AsB">—</td></tr>
+        <tr><td class="dk">Development length ℓ<sub>d</sub></td><td class="dv" id="r-ld">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Reinforcement -->
+    <div style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">
+      Reinforcement Summary
+    </div>
+    <div class="rebar-cards">
+      <div class="rebar-card">
+        <div class="rebar-dir">L — Direction (Long)</div>
+        <div class="rebar-main" id="rb-L-main">—</div>
+        <div class="rebar-detail" id="rb-L-detail">—</div>
+      </div>
+      <div class="rebar-card">
+        <div class="rebar-dir">B — Direction (Short)</div>
+        <div class="rebar-main" id="rb-B-main">—</div>
+        <div class="rebar-detail" id="rb-B-detail">—</div>
+      </div>
+    </div>
+
+    <!-- Footing Plan Canvas -->
+    <div class="canvas-block">
+      <div class="canvas-block-title">
+        <span>Footing Plan View — Column at Edge</span>
+        <span style="font-size:10px;color:var(--text3)">Not to scale</span>
+      </div>
+      <div class="canvas-inner">
+        <canvas id="planCanvas" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Pressure Diagram Canvas -->
+    <div class="canvas-block">
+      <div class="canvas-block-title">
+        <span>Soil Pressure Distribution</span>
+        <span style="font-size:10px;color:var(--accent)" id="ptype-label">—</span>
+      </div>
+      <div class="canvas-inner">
+        <canvas id="pressureCanvas" height="180"></canvas>
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+</div><!-- /layout -->
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* =============================================================
+   UNIT SYSTEM
+   ============================================================= */
+let unitSystem = 'SI'; // SI or IMP
+
+function setUnits(sys) {
+  unitSystem = sys;
+  document.getElementById('btn-si').classList.toggle('active',  sys === 'SI');
+  document.getElementById('btn-imp').classList.toggle('active', sys === 'IMP');
+  // Update unit labels
+  const mLbl  = sys === 'SI' ? 'm'      : 'ft';
+  const knLbl = sys === 'SI' ? 'kN'     : 'kip';
+  const knmLbl= sys === 'SI' ? 'kN·m'   : 'kip·ft';
+  const kpaLbl= sys === 'SI' ? 'kPa'    : 'ksf';
+  const kn3Lbl= sys === 'SI' ? 'kN/m³'  : 'pcf';
+  document.getElementById('u-m1').textContent  = mLbl;
+  document.getElementById('u-m2').textContent  = mLbl;
+  document.getElementById('u-m3').textContent  = mLbl;
+  document.getElementById('u-m4').textContent  = mLbl;
+  document.getElementById('u-m5').textContent  = mLbl;
+  document.getElementById('u-m6').textContent  = mLbl;
+  document.getElementById('u-kn1').textContent  = knLbl;
+  document.getElementById('u-kn2').textContent  = knLbl;
+  document.getElementById('u-knm').textContent  = knmLbl;
+  document.getElementById('u-kpa').textContent  = kpaLbl;
+  document.getElementById('u-kn3').textContent  = kn3Lbl;
+  document.getElementById('u-kn4').textContent  = kn3Lbl;
+  recalculate();
+}
+
+/* =============================================================
+   HELPERS
+   ============================================================= */
+function g(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function gStr(id) { return document.getElementById(id).value.trim(); }
+function set(id, html) { const el = document.getElementById(id); if(el) el.innerHTML = html; }
+function fmt(v, d=2) { return isNaN(v) ? '—' : v.toFixed(d); }
+function fmtU(v, unit, d=2) { return fmt(v, d) + ' ' + unit; }
+
+/* Convert to SI if in imperial (1 ft=0.3048m, 1 kip=4.448kN, 1 ksf=47.88kPa, 1 pcf=0.157kN/m³) */
+function toSI(val, type) {
+  if (unitSystem === 'SI') return val;
+  const conv = { m: 0.3048, kN: 4.4482, 'kN·m': 4.4482*0.3048, kPa: 47.8803, 'kN/m³': 0.15709 };
+  return val * (conv[type] || 1);
+}
+function fromSI(val, type) {
+  if (unitSystem === 'SI') return val;
+  const conv = { m: 0.3048, kN: 4.4482, 'kN·m': 4.4482*0.3048, kPa: 47.8803, 'kN/m³': 0.15709 };
+  return val / (conv[type] || 1);
+}
+function uM()   { return unitSystem==='SI'?'m':'ft'; }
+function uKN()  { return unitSystem==='SI'?'kN':'kip'; }
+function uKNm() { return unitSystem==='SI'?'kN·m':'kip·ft'; }
+function uKPa() { return unitSystem==='SI'?'kPa':'ksf'; }
+
+/* Check helper */
+function applyCheck(idPrefix, demand, capacity, demandLabel, capLabel, passText, failText, warnMode=false) {
+  const ok  = demand <= capacity;
+  const rat = capacity > 0 ? demand / capacity : 0;
+  const cls = ok ? 'badge-pass' : 'badge-fail';
+  const pct = Math.min(rat * 100, 100).toFixed(0);
+  const color = ok ? '#22c97a' : '#f25c5c';
+  set(idPrefix+'-d', demandLabel + ' <span style="color:var(--text3)">/ ' + capLabel + '</span>');
+  set(idPrefix+'-b', '<span class="check-badge ' + cls + '">' + (ok ? passText : failText) + '</span>');
+  set(idPrefix+'-r', 'D/C = ' + fmt(rat, 3));
+  const bar = document.getElementById(idPrefix+'-bar');
+  if (bar) { bar.style.width = pct + '%'; bar.style.background = color; }
+  return ok;
+}
+
+/* =============================================================
+   MAIN CALCULATION ENGINE
+   ============================================================= */
+function recalculate() {
+  try {
+    const R = doCalculate();
+    renderResults(R);
+    drawPlanCanvas(R);
+    drawPressureCanvas(R);
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function doCalculate() {
+  /* ---- Read inputs (convert to SI internally) ---- */
+  const bc  = toSI(g('bc'),   'm');   // column width [m]
+  const dc  = toSI(g('dc'),   'm');   // column length [m]
+  const ed  = toSI(g('edgedist'),'m');// edge distance [m]
+  const DL  = toSI(g('DL'),   'kN');  // Dead Load [kN]
+  const LL  = toSI(g('LL'),   'kN');  // Live Load [kN]
+  const M   = toSI(g('M'),    'kN·m');// Moment [kN·m]
+  const qa  = toSI(g('qa'),   'kPa'); // Allowable soil pressure [kPa]
+  const gs  = toSI(g('gs'),   'kN/m³');
+  const Df  = toSI(g('Df'),   'm');
+  const gc  = toSI(g('gc'),   'kN/m³');
+  const fc  = g('fc');                // MPa — no conversion
+  const fy  = g('fy');                // MPa
+  const cov = g('cover') / 1000;     // [m]
+  const db  = g('bardia') / 1000;    // [m]
+  const h   = g('thick') / 1000;     // [m]
+  const phi_f = 0.90;
+  const phi_s = 0.75;
+  const gamDL = 1.2;
+  const gamLL = 1.6;
+
+  /* ---- A. FACTORED LOADS (NSCP 2015 Sec. 405.3.1) ---- */
+  const Ps  = DL + LL;                   // Service load [kN]
+  const Pu  = gamDL * DL + gamLL * LL;   // Factored vertical load [kN]
+  const Mu  = gamDL * M;                 // Factored moment [kN·m]
+                                          // (conservative: factor moment by 1.2DL factor;
+                                          //  if moment comes from LL, use 1.6)
+
+  /* ---- B. EFFECTIVE DEPTH ---- */
+  const d = h - cov - db;               // Effective depth [m]
+
+  /* ---- C. NET ALLOWABLE PRESSURE ---- */
+  // Deduct weight of soil and concrete above footing
+  const q_net = qa - gs * Df;           // [kPa] net allowable
+
+  /* ---- D. REQUIRED FOOTING AREA ---- */
+  const A_req = Ps / q_net;             // [m²]
+
+  /* ---- E. FOOTING DIMENSIONS ---- */
+  // For edge footing: eccentricity causes non-uniform pressure.
+  // Strategy: solve B × L iteratively so qmax ≤ qa and qmin ≥ 0.
+  // Start with L = 1.5B, then refine.
+  let B, L;
+  const overBRaw = g('overrideB');
+  const overLRaw = g('overrideL');
+  const hasB = overBRaw > 0;
+  const hasL = overLRaw > 0;
+
+  if (hasB && hasL) {
+    B = toSI(overBRaw, 'm');
+    L = toSI(overLRaw, 'm');
+  } else {
+    // Solve iteratively: L such that qmin ≥ 0
+    // qmin = Pu/A - Mu/S = Pu/(BL) - 6Mu/(BL²) ≥ 0
+    // => Pu*L ≥ 6*Mu => L ≥ 6*Mu/Pu
+    const L_min_kern = (Pu > 0) ? 6 * Mu / Pu : 1.0;
+    const L_from_area = Math.sqrt(A_req / 1.5);  // with L=1.5B assumption
+    L = Math.max(L_min_kern * 1.1, L_from_area, dc + 0.5);
+    B = Math.max(A_req / L, bc + 0.3);
+    // Round up to nearest 0.1m
+    L = Math.ceil(L * 10) / 10;
+    B = Math.ceil(B * 10) / 10;
+    if (hasB) B = toSI(overBRaw, 'm');
+    if (hasL) L = toSI(overLRaw, 'm');
+  }
+
+  const A  = B * L;
+  const S  = B * L * L / 6;   // Section modulus [m³]
+
+  /* ---- F. SOIL PRESSURE (NSCP 2015 Sec. 418) ---- */
+  // q = Pu/A ± Mu/S  [kPa]
+  const q_avg  = Pu / A;
+  const q_ecc  = Mu / S;
+  const q_max  = q_avg + q_ecc;
+  const q_min  = q_avg - q_ecc;
+  const e      = Mu / Pu;              // Eccentricity [m]
+  const kern   = L / 6;               // Kern limit [m]
+
+  // Actual qmax/qmin for triangular pressure (kern exceeded)
+  let q_max_act = q_max, q_min_act = q_min, ptype;
+  if (e <= kern) {
+    ptype = q_min >= 0 ? 'Trapezoidal' : 'Triangular (partially)';
+  } else {
+    // Triangular, resultant within 3(L/2-e) from toe
+    const a = 3 * (L / 2 - e);
+    if (a > 0) {
+      q_max_act = 2 * Pu / (3 * B * (L / 2 - e));
+      q_min_act = 0;
+      ptype = 'Triangular (kern exceeded)';
+    } else {
+      q_max_act = 2 * Pu / (B * L);
+      q_min_act = 0;
+      ptype = 'Triangular (extreme eccentricity)';
+    }
+  }
+
+  /* ---- G. TWO-WAY PUNCHING SHEAR (NSCP 2015 Sec. 422.6) ---- */
+  // Critical perimeter at d/2 from column face
+  // For corner/edge column: 3 sides only (one side is at free edge)
+  const bop = bc + d;    // punching perimeter dimension
+  const dop = dc + d;
+  // Edge column: two full sides + one partial (the side at the edge is free)
+  const bo  = 2 * dop + bop;  // 3-sided perimeter for edge column
+  // Punching shear capacity (governs of 3 equations):
+  const beta_c = Math.max(dc/bc, bc/dc);
+  const as = 30; // shear constant: 40-interior, 30-edge, 20-corner
+  const phi_Vc2_1 = phi_s * (1/3) * Math.sqrt(fc) * bo * d * 1000; // basic [kN]
+  const phi_Vc2_2 = phi_s * (1/6) * (1 + 2/beta_c) * Math.sqrt(fc) * bo * d * 1000;
+  const phi_Vc2_3 = phi_s * (1/12) * (as*d/bo + 2) * Math.sqrt(fc) * bo * d * 1000;
+  const phi_Vc2   = Math.min(phi_Vc2_1, phi_Vc2_2, phi_Vc2_3);
+  // Punching shear demand: total factored load minus soil reaction within critical area
+  const A_punch  = bop * dop;
+  const q_punch  = q_max_act; // conservative: use qmax
+  const Vu2      = Pu - q_punch * A_punch;
+
+  /* ---- H. ONE-WAY BEAM SHEAR (NSCP 2015 Sec. 422.5) ---- */
+  // Critical section at distance d from face of column
+  // L-direction (long): cantilever from free edge
+  const x1 = (L / 2 - dc / 2) - d;   // dist from face of col to critical sect [m]
+  const q_at_crit = q_min_act + (q_max_act - q_min_act) * (L/2 - dc/2 - d + ed) / L;
+  const q_avg_crit = (q_at_crit + q_max_act) / 2;
+  const Vu1  = Math.max(0, q_avg_crit * Math.max(x1, 0) * B);   // [kN]
+  const phi_Vc1 = phi_s * (1/6) * Math.sqrt(fc) * B * d * 1000; // [kN]
+
+  /* ---- I. FLEXURE (NSCP 2015 Sec. 422.4) ---- */
+  // Critical section at face of column
+  // L-direction moment:
+  const x_face_L = L / 2 - dc / 2 + ed; // cantilever length from edge
+  const q_at_face = q_min_act + (q_max_act - q_min_act) * (L - x_face_L) / L;
+  const q_avg_face = (q_at_face + q_max_act) / 2;
+  const MuL  = q_avg_face * x_face_L * x_face_L / 2 * B; // [kN·m]
+  // B-direction moment (uniform q_max_act used):
+  const x_face_B = (B - bc) / 2;
+  const MuB  = q_max_act * x_face_B * x_face_B / 2 * L; // [kN·m]
+  // Governing moment (for ρ calculation — use L-dir as governs):
+  const Mu_gov = Math.max(MuL, MuB);
+
+  /* ---- REINFORCEMENT DESIGN (Singly reinforced) ---- */
+  // Nominal moment capacity: Mn = As·fy·(d - a/2)
+  // Whitney stress block: a = As·fy/(0.85·f'c·B)
+  // Solving quadratic for As:
+  // phi*As*fy*(d - As*fy/(2*0.85*fc*B)) = Mu
+  // Let k = fy/(2*0.85*fc*B*1000) [units: m²/mm²·kN/kPa simplification]
+  // Working in consistent units [kN, m, MPa=kN/m²*1000]:
+  // fc in MPa, B in m, d in m, Mu in kN·m
+  // Rn = Mu/(phi_f*B*d²) [kN/m² = kPa]
+  const Rn_L = MuL * 1000 / (phi_f * B * d * d * 1e6); // [MPa]
+  const rho_L = (0.85 * fc / fy) * (1 - Math.sqrt(1 - 2 * Rn_L / (0.85 * fc)));
+  const rho_min = Math.max(1.4 / fy, 0.25 * Math.sqrt(fc) / fy);
+  const rho_max = 0.75 * (0.85 * 0.85 * fc / fy) * (600 / (600 + fy)); // balanced*0.75
+  const rho_gov_L = Math.max(rho_L, rho_min);
+
+  // B-direction
+  const Rn_B = MuB * 1000 / (phi_f * L * d * d * 1e6); // [MPa]
+  const rho_B = (0.85 * fc / fy) * (1 - Math.sqrt(1 - 2 * Rn_B / (0.85 * fc)));
+  const rho_gov_B = Math.max(rho_B, rho_min);
+
+  // Required steel areas [mm²]
+  const AsL = rho_gov_L * B * d * 1e6;    // [mm²]
+  const AsB = rho_gov_B * L * d * 1e6;    // [mm²]
+
+  /* ---- BAR SELECTION ---- */
+  function selectBars(As_req, width_m, cover_m, barDia_m) {
+    const Ab = Math.PI * (barDia_m*1000) * (barDia_m*1000) / 4; // [mm²]
+    const n  = Math.ceil(As_req / Ab);
+    const usable = width_m * 1000 - 2 * cover_m * 1000; // [mm]
+    const spacing = n > 1 ? Math.floor(usable / (n - 1)) : Math.floor(usable);
+    const As_prov = n * Ab;
+    return { n, Ab, spacing, As_prov };
+  }
+  const barL = selectBars(AsL, B, cov, db);
+  const barB = selectBars(AsB, L, cov, db);
+
+  /* ---- DEVELOPMENT LENGTH (NSCP 2015 Sec. 425) ---- */
+  // ld = (fy·ψt·ψe·ψs) / (1.1·λ·√f'c) · db  [mm]
+  const psi_t = 1.0; // bottom bars
+  const psi_e = 1.0; // uncoated
+  const psi_s = (db * 1000 <= 19) ? 0.8 : 1.0;
+  const lam   = 1.0; // normal weight concrete
+  const ld    = Math.max(
+    (fy * psi_t * psi_e * psi_s) / (1.1 * lam * Math.sqrt(fc)) * (db * 1000),
+    300
+  ); // [mm]
+  const l_avail_L = (L/2 - dc/2) * 1000 - cov * 1000; // [mm]
+  const l_avail_B = (B/2 - bc/2) * 1000 - cov * 1000; // [mm]
+
+  /* ---- COLLECT RESULTS ---- */
+  return {
+    bc, dc, ed, DL, LL, M, qa, gs, Df, gc, fc, fy, cov, db, h, d,
+    phi_f, phi_s, gamDL, gamLL,
+    Ps, Pu, Mu, q_net, A_req,
+    B, L, A, S,
+    q_avg, q_ecc, q_max: q_max_act, q_min: q_min_act, ptype, e, kern,
+    bo, A_punch, Vu2, phi_Vc2, phi_Vc2_1, phi_Vc2_2, phi_Vc2_3,
+    x1, Vu1, phi_Vc1,
+    MuL, MuB, Rn_L, rho_L, rho_min, rho_max, rho_gov_L, rho_gov_B,
+    AsL, AsB, barL, barB, db, ld, l_avail_L, l_avail_B,
+    // Pass/Fail
+    ok_bearing: q_max_act <= qa,
+    ok_tension: q_min_act >= -0.001,
+    ok_punch:   Vu2 <= phi_Vc2,
+    ok_shear1:  Vu1 <= phi_Vc1,
+    ok_devlen:  Math.min(l_avail_L, l_avail_B) >= ld,
+    ok_kern:    e <= kern
+  };
+}
+
+/* =============================================================
+   RENDER RESULTS
+   ============================================================= */
+function renderResults(R) {
+  const um = uM(), ukn = uKN(), uknm = uKNm(), ukpa = uKPa();
+
+  /* Helper for display unit conversion */
+  function dm(v) { return fmt(fromSI(v, 'm'), 3); }
+  function dkn(v){ return fmt(fromSI(v,'kN'), 1); }
+  function dknm(v){return fmt(fromSI(v,'kN·m'), 2); }
+  function dkpa(v){return fmt(fromSI(v,'kPa'), 2);}
+
+  /* Overall status */
+  const allOk = R.ok_bearing && R.ok_tension && R.ok_punch && R.ok_shear1 && R.ok_devlen;
+  const sb = document.getElementById('overall-status');
+  if (allOk) { sb.textContent = 'DESIGN OK'; sb.className = 'status-badge status-ok'; }
+  else        { sb.textContent = 'REVIEW REQUIRED'; sb.className = 'status-badge status-fail'; }
+
+  /* Key metrics */
+  set('m-dims',  dm(R.B) + ' × ' + dm(R.L));
+  set('m-qmax',  dkpa(R.q_max));
+  set('m-pu',    dkn(R.Pu));
+
+  /* Checks */
+  applyCheck('chk-bearing',
+    R.q_max, R.qa,
+    dkpa(R.q_max)+' '+ukpa, dkpa(R.qa)+' '+ukpa,
+    'PASS', 'FAIL');
+
+  applyCheck('chk-tension',
+    Math.max(-R.q_min, 0)+0.001, 0.001,
+    dkpa(R.q_min)+' '+ukpa, '≥ 0',
+    'PASS', 'TENSION!');
+
+  applyCheck('chk-punch',
+    R.Vu2, R.phi_Vc2,
+    dkn(R.Vu2)+' '+ukn, dkn(R.phi_Vc2)+' '+ukn,
+    'PASS', 'FAIL');
+
+  applyCheck('chk-shear1',
+    R.Vu1, R.phi_Vc1,
+    dkn(R.Vu1)+' '+ukn, dkn(R.phi_Vc1)+' '+ukn,
+    'PASS', 'FAIL');
+
+  applyCheck('chk-devlen',
+    R.ld, Math.min(R.l_avail_L, R.l_avail_B),
+    fmt(R.ld,0)+' mm', fmt(Math.min(R.l_avail_L,R.l_avail_B),0)+' mm',
+    'PASS', 'FAIL');
+
+  applyCheck('chk-kern',
+    R.e, R.kern,
+    dm(R.e)+' '+um, dm(R.kern)+' '+um,
+    'IN KERN', 'EXCEEDED');
+
+  /* Load analysis */
+  set('r-Ps',   dkn(R.Ps)  + ' ' + ukn);
+  set('r-Pu',   dkn(R.Pu)  + ' ' + ukn);
+  set('r-Mu',   dknm(R.Mu) + ' ' + uknm);
+  set('r-ecc',  dm(R.e)    + ' ' + um);
+  set('r-kern', dm(R.kern) + ' ' + um + (R.ok_kern ? '' : ' <span style="color:var(--amber)">⚠ exceeded</span>'));
+  set('r-qnet', dkpa(R.q_net) + ' ' + ukpa);
+  set('r-Areq', fmt(fromSI(R.A_req,'m')*fromSI(1,'m'),2) + ' ' + um + '²');
+
+  /* Footing geometry */
+  set('r-B',  dm(R.B)   + ' ' + um);
+  set('r-L',  dm(R.L)   + ' ' + um);
+  set('r-h',  fmt(R.h*1000,0) + ' mm');
+  set('r-d',  fmt(R.d*1000,1) + ' mm');
+  set('r-A',  fmt(R.A,3) + ' m²');
+  set('r-S',  fmt(R.S,4) + ' m³');
+
+  /* Soil pressure */
+  const qmaxClass = R.ok_bearing ? 'hi'   : 'bad';
+  const qminClass = R.ok_tension ? 'dv'   : 'warn';
+  set('r-qmax',  `<span class="${qmaxClass}">${dkpa(R.q_max)} ${ukpa}</span>`);
+  set('r-qmin',  `<span class="${R.q_min<0?'bad':'dv'}">${dkpa(R.q_min)} ${ukpa}</span>`);
+  set('r-qa',    dkpa(R.qa) + ' ' + ukpa);
+  set('r-ptype', R.ptype);
+  set('ptype-label', R.ptype);
+
+  /* Shear */
+  set('r-bo',   fmt(R.bo*1000,1) + ' mm');
+  set('r-Vu2',  dkn(R.Vu2)    + ' ' + ukn + (R.ok_punch ? '' : ' <span style="color:var(--red)">FAILS</span>'));
+  set('r-Vc2',  dkn(R.phi_Vc2)+ ' ' + ukn);
+  set('r-x1way',fmt(Math.max(R.x1,0)*1000,1) + ' mm from col. face');
+  set('r-Vu1',  dkn(R.Vu1)    + ' ' + ukn + (R.ok_shear1 ? '' : ' <span style="color:var(--red)">FAILS</span>'));
+  set('r-Vc1',  dkn(R.phi_Vc1)+ ' ' + ukn);
+
+  /* Flexure */
+  set('r-MuL',    dknm(R.MuL)  + ' ' + uknm);
+  set('r-MuB',    dknm(R.MuB)  + ' ' + uknm);
+  set('r-Rn',     fmt(R.Rn_L,3)  + ' MPa');
+  set('r-rho',    fmt(R.rho_L*100,4) + '%');
+  set('r-rhomin', fmt(R.rho_min*100,4) + '%');
+  set('r-rhogov', fmt(R.rho_gov_L*100,4) + '%');
+  set('r-AsL',    fmt(R.AsL,0) + ' mm²');
+  set('r-AsB',    fmt(R.AsB,0) + ' mm²');
+  set('r-ld',     fmt(R.ld,0)  + ' mm');
+
+  /* Rebar */
+  const barDmm = fmt(R.db*1000, 0);
+  set('rb-L-main', `${R.barL.n}-Ø${barDmm}mm`);
+  set('rb-L-detail',
+    `Spacing: <span>${R.barL.spacing} mm c/c</span><br>` +
+    `A<sub>s,prov</sub>: <span>${fmt(R.barL.As_prov,0)} mm²</span><br>` +
+    `A<sub>s,req</sub>: <span>${fmt(R.AsL,0)} mm²</span><br>` +
+    `ρ = <span>${fmt(R.rho_gov_L*100,4)}%</span>`
+  );
+  set('rb-B-main', `${R.barB.n}-Ø${barDmm}mm`);
+  set('rb-B-detail',
+    `Spacing: <span>${R.barB.spacing} mm c/c</span><br>` +
+    `A<sub>s,prov</sub>: <span>${fmt(R.barB.As_prov,0)} mm²</span><br>` +
+    `A<sub>s,req</sub>: <span>${fmt(R.AsB,0)} mm²</span><br>` +
+    `ρ = <span>${fmt(R.rho_gov_B*100,4)}%</span>`
+  );
+
+  /* Warnings */
+  const warns = [];
+  if (!R.ok_bearing) warns.push('Bearing capacity exceeded — increase footing size or reduce load');
+  if (!R.ok_tension) warns.push('Tension developing under footing — increase L to keep e ≤ L/6');
+  if (!R.ok_punch)   warns.push('Punching shear fails — increase footing thickness or add shear reinforcement');
+  if (!R.ok_shear1)  warns.push('Beam shear fails — increase effective depth (thickness)');
+  if (!R.ok_devlen)  warns.push('Insufficient development length — increase footing dimensions');
+  if (!R.ok_kern)    warns.push('Eccentricity exceeds kern — partial bearing (tension side lifts off)');
+  if (R.rho_gov_L > R.rho_max) warns.push('Steel ratio exceeds maximum — increase depth or f\'c');
+  const wBox = document.getElementById('warning-box');
+  const wTxt = document.getElementById('warning-text');
+  if (warns.length) {
+    wBox.classList.add('show');
+    wTxt.innerHTML = warns.map(w=>'• '+w).join('<br>');
+  } else {
+    wBox.classList.remove('show');
+  }
+}
+
+/* =============================================================
+   CANVAS: FOOTING PLAN VIEW
+   ============================================================= */
+function drawPlanCanvas(R) {
+  const canvas = document.getElementById('planCanvas');
+  if (!canvas) return;
+  const cw = canvas.offsetWidth || 600;
+  canvas.width = cw;
+  const ch = 220;
+  canvas.height = ch;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, cw, ch);
+
+  // Scale to fit
+  const pad = 40;
+  const scaleX = (cw - 2*pad) / R.L;
+  const scaleY = (ch - 2*pad) / R.B;
+  const sc = Math.min(scaleX, scaleY);
+  const fw = R.L * sc;
+  const fh = R.B * sc;
+  const ox = pad;
+  const oy = (ch - fh) / 2;
+
+  // Footing outline
+  ctx.save();
+  ctx.fillStyle = '#1e2330';
+  ctx.strokeStyle = '#4f8ef7';
+  ctx.lineWidth = 1.5;
+  ctx.fillRect(ox, oy, fw, fh);
+  ctx.strokeRect(ox, oy, fw, fh);
+
+  // Hatching for footing
+  ctx.strokeStyle = 'rgba(79,142,247,0.12)';
+  ctx.lineWidth = 0.5;
+  for (let x = ox; x < ox+fw; x += 12) {
+    ctx.beginPath(); ctx.moveTo(x, oy); ctx.lineTo(x, oy+fh); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Edge line (left side — property line / edge)
+  ctx.save();
+  ctx.strokeStyle = '#f25c5c';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([6, 3]);
+  ctx.beginPath();
+  ctx.moveTo(ox, oy - 10);
+  ctx.lineTo(ox, oy + fh + 10);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Column
+  const cx_pos = ox + R.ed * sc;                    // edge offset
+  const col_w  = R.bc * sc;
+  const col_h  = R.dc * sc;
+  const col_y  = oy + (fh - col_h) / 2;
+  ctx.save();
+  ctx.fillStyle = '#f5a623';
+  ctx.globalAlpha = 0.8;
+  ctx.fillRect(cx_pos, col_y, col_w, col_h);
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = '#f5a623';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(cx_pos, col_y, col_w, col_h);
+  ctx.restore();
+
+  // Critical shear perimeter (dashed blue)
+  const d_sc = R.d * sc;
+  ctx.save();
+  ctx.strokeStyle = '#22c97a';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,3]);
+  ctx.strokeRect(
+    cx_pos - d_sc/2,
+    col_y - d_sc/2,
+    col_w + d_sc,
+    col_h + d_sc
+  );
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Dimension lines
+  ctx.save();
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillStyle = '#9aa3b8';
+  ctx.textAlign = 'center';
+
+  // Width B (vertical, right side)
+  const dxB = ox + fw + 14;
+  ctx.strokeStyle = '#5c6478';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(dxB, oy); ctx.lineTo(dxB, oy+fh); ctx.stroke();
+  ctx.save();
+  ctx.translate(dxB+9, oy+fh/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('B=' + fmt(R.B,2)+'m', 0, 0);
+  ctx.restore();
+
+  // Length L (bottom)
+  const dyL = oy + fh + 14;
+  ctx.beginPath(); ctx.moveTo(ox, dyL); ctx.lineTo(ox+fw, dyL); ctx.stroke();
+  ctx.fillText('L=' + fmt(R.L,2)+'m', ox+fw/2, dyL+12);
+
+  ctx.restore();
+
+  // Labels
+  ctx.save();
+  ctx.font = 'bold 10px IBM Plex Mono, monospace';
+  ctx.fillStyle = '#f5a623';
+  ctx.textAlign = 'center';
+  ctx.fillText('COL', cx_pos + col_w/2, col_y + col_h/2 + 3);
+
+  ctx.fillStyle = '#f25c5c';
+  ctx.textAlign = 'left';
+  ctx.fillText('EDGE', ox+2, oy-14);
+
+  ctx.fillStyle = '#22c97a';
+  ctx.textAlign = 'left';
+  ctx.fillText('— critical perim (d/2)', cx_pos + col_w + d_sc/2 + 4, col_y - d_sc/2 - 4);
+  ctx.restore();
+}
+
+/* =============================================================
+   CANVAS: SOIL PRESSURE DIAGRAM
+   ============================================================= */
+function drawPressureCanvas(R) {
+  const canvas = document.getElementById('pressureCanvas');
+  if (!canvas) return;
+  const cw = canvas.offsetWidth || 600;
+  canvas.width = cw;
+  const ch = 180;
+  canvas.height = ch;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, cw, ch);
+
+  const padL=50, padR=20, padT=20, padB=50;
+  const pw = cw - padL - padR;
+  const ph = ch - padT - padB;
+
+  const q_scale = Math.max(R.q_max * 1.15, R.qa * 1.1, 10);
+
+  function xMap(xFrac) { return padL + xFrac * pw; }
+  function yMap(q)     { return padT + ph - (q / q_scale) * ph; }
+
+  // Baseline
+  ctx.save();
+  ctx.strokeStyle = '#2a2f3e';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + ph);
+  ctx.lineTo(padL + pw, padT + ph);
+  ctx.stroke();
+
+  // Allowable line
+  ctx.strokeStyle = '#f25c5c';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6,3]);
+  ctx.beginPath();
+  ctx.moveTo(padL, yMap(R.qa));
+  ctx.lineTo(padL+pw, yMap(R.qa));
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillStyle = '#f25c5c';
+  ctx.textAlign = 'right';
+  ctx.fillText('q_a=' + fmt(R.qa,0), padL-3, yMap(R.qa)+4);
+
+  // Pressure trapezoid/triangle
+  const pts = 40;
+  const pressures = [];
+  for (let i=0;i<=pts;i++) {
+    const frac = i/pts;
+    const x = frac * R.L;
+    // linear distribution from edge (x=0, qmax) to far end (x=L, qmin)
+    const q = R.q_max - (R.q_max - R.q_min) * frac;
+    pressures.push({ x: xMap(frac), y: yMap(Math.max(q,0)), q });
+  }
+
+  // Fill
+  ctx.beginPath();
+  ctx.moveTo(padL, padT+ph);
+  pressures.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(padL+pw, padT+ph);
+  ctx.closePath();
+  ctx.fillStyle = R.ok_bearing ? 'rgba(79,142,247,0.13)' : 'rgba(242,92,92,0.13)';
+  ctx.fill();
+
+  // Stroke
+  ctx.beginPath();
+  ctx.moveTo(pressures[0].x, pressures[0].y);
+  pressures.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = R.ok_bearing ? '#4f8ef7' : '#f25c5c';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Vertical arrows (every 8 steps)
+  for (let i=0;i<=pts;i+=4) {
+    const p = pressures[i];
+    const y0 = padT+ph;
+    if (p.y < y0-4) {
+      ctx.strokeStyle = 'rgba(79,142,247,0.35)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(p.x, y0); ctx.lineTo(p.x, p.y+4); ctx.stroke();
+      // arrowhead
+      ctx.fillStyle = 'rgba(79,142,247,0.5)';
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y); ctx.lineTo(p.x-3, p.y+7); ctx.lineTo(p.x+3, p.y+7);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // qmax / qmin labels
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillStyle = '#e8ecf4';
+  ctx.textAlign = 'left';
+  ctx.fillText('q_max=' + fmt(R.q_max,1)+' kPa', padL+3, yMap(R.q_max)-5);
+  ctx.textAlign = 'right';
+  ctx.fillText('q_min=' + fmt(R.q_min,1)+' kPa', padL+pw-3, yMap(R.q_min)-5);
+
+  // Footing baseline label
+  ctx.fillStyle = '#5c6478';
+  ctx.textAlign = 'center';
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillText('Footing length L = ' + fmt(R.L,2) + ' m', padL+pw/2, ch-6);
+
+  // Column position indicator
+  const col_x = padL + (R.ed/R.L)*pw;
+  const col_x2 = padL + ((R.ed+R.dc)/R.L)*pw;
+  ctx.fillStyle = 'rgba(245,166,35,0.2)';
+  ctx.fillRect(col_x, padT, col_x2-col_x, ph);
+  ctx.strokeStyle = 'rgba(245,166,35,0.5)';
+  ctx.lineWidth=0.8;
+  ctx.strokeRect(col_x, padT, col_x2-col_x, ph);
+
+  ctx.restore();
+}
+
+/* =============================================================
+   EXPORT PDF (using browser print)
+   ============================================================= */
+function exportPDF() {
+  window.print();
+}
+
+/* =============================================================
+   EVENT LISTENERS — auto-recalculate on any input change
+   ============================================================= */
+document.querySelectorAll('input[type=number]').forEach(inp => {
+  inp.addEventListener('input',  recalculate);
+  inp.addEventListener('change', recalculate);
+});
+
+/* Window resize redraws canvases */
+window.addEventListener('resize', () => {
+  try {
+    const R = doCalculate();
+    drawPlanCanvas(R);
+    drawPressureCanvas(R);
+  } catch(e) {}
+});
+
+/* Initial calculation on load */
+recalculate();
+</script>
+</body>
+</html>
