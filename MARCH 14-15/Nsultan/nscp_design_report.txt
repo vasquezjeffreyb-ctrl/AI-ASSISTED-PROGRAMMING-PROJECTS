@@ -1,0 +1,167 @@
+======================================================================
+  NSCP 2015 STRUCTURAL DESIGN REPORT
+  2-STOREY RESIDENTIAL BUILDING WITH ROOF DECK
+  9m x 11m Lot | Garage | 3 Bedrooms + Terrace | Roof Deck
+======================================================================
+
+1. BUILDING DATA
+----------------------------------------
+   Lot dimension    : 9.0m x 11.0m
+   Building footprint: 8.0m x 10.0m (with 0.5m setback)
+   Number of storeys : 2 + Roof Deck
+   Floor heights     : GF=3.0m, 1F=3.0m
+   Total height      : 7.2m
+   Number of columns : 16
+
+2. MATERIALS (NSCP 2015)
+----------------------------------------
+   Concrete  fc' = 28.0 MPa    (normal weight)
+   Main bars fy  = 415.0 MPa    (ASTM Grade 60 / PSNS)
+   Stirrups  fys = 275.0 MPa
+   Ec = 24870 MPa
+   Unit wt   yc  = 24.0 kN/m3
+
+3. DESIGN LOADS (NSCP 2015 Section 204/205)
+----------------------------------------
+   Dead load floor finish  : 1.5 kN/m2
+   Dead load ceiling       : 0.5 kN/m2
+   Dead load partitions    : 1.0 kN/m2
+   Live load residential   : 2.0 kN/m2
+   Live load roof deck     : 4.8 kN/m2
+   Live load garage        : 2.4 kN/m2
+   Load factors            : 1.2D + 1.6L  (NSCP 2015 Sec. 409)
+
+4. COLUMN GRID & TRIBUTARY AREAS
+----------------------------------------
+   Column grid X : ['0.0', '3.0', '5.5', '8.0'] m
+   Column grid Y : ['0.0', '3.5', '7.0', '10.0'] m
+   Bay X lengths : ['3.0', '2.5', '2.5'] m
+   Bay Y lengths : ['3.5', '3.5', '3.0'] m
+
+   Column loads summary:
+   Label    x(m)   y(m)   A_trib(m2)   PD(kN)     PL(kN)     Pu(kN)    
+   --------------------------------------------------------------
+   C11         0.0    0.0         2.62       61.4       24.2      112.3
+   C12         0.0    3.5         5.25      107.3       48.3      206.1
+   C13         0.0    7.0         4.88      100.7       44.8      192.7
+   C14         0.0   10.0         2.25       54.8       20.7       98.9
+   C21         3.0    0.0         4.81       99.3       44.3      190.0
+   C22         3.0    3.5         9.62      181.1       88.5      359.0
+   C23         3.0    7.0         8.94      169.4       82.2      334.9
+   C24         3.0   10.0         4.12       87.6       38.0      165.9
+   C31         5.5    0.0         4.38       91.7       40.2      174.5
+   C32         5.5    3.5         8.75      166.4       80.5      328.4
+   C33         5.5    7.0         8.12      155.7       74.8      306.4
+   C34         5.5   10.0         3.75       81.1       34.5      152.5
+   C41         8.0    0.0         2.19       53.8       20.1       96.7
+   C42         8.0    3.5         4.38       92.5       40.2      175.5
+   C43         8.0    7.0         4.06       87.0       37.4      164.2
+   C44         8.0   10.0         1.88       48.2       17.2       85.5
+
+5. BEAM DESIGN
+----------------------------------------
+   [MB-Y (Main Beam, Y-dir, L=3.5m)]
+   Size          : 250mm x 400mm
+   Span          : 3.5m
+   wu (factored) : 17.580 kN/m
+   Mu (factored) : 26.92 kN.m
+   Vu (factored) : 30.76 kN
+   eff. depth d  : 342mm
+   rho (used)    : 0.00337
+   As required   : 288 mm2
+   Bars provided : 2 - 16mm phi  (As=402mm2)
+   Stirrups      : 10mm phi @ 175mm spacing
+
+   [MB-X (Main Beam, X-dir, L=3.0m)]
+   Size          : 250mm x 400mm
+   Span          : 3.0m
+   wu (factored) : 20.180 kN/m
+   Mu (factored) : 22.70 kN.m
+   Vu (factored) : 30.27 kN
+   eff. depth d  : 342mm
+   rho (used)    : 0.00337
+   As required   : 288 mm2
+   Bars provided : 2 - 16mm phi  (As=402mm2)
+   Stirrups      : 10mm phi @ 175mm spacing
+
+   [RB (Roof Beam, L=3.5m)]
+   Size          : 200mm x 300mm
+   Span          : 3.5m
+   wu (factored) : 20.592 kN/m
+   Mu (factored) : 31.53 kN.m
+   Vu (factored) : 36.04 kN
+   eff. depth d  : 242mm
+   rho (used)    : 0.00773
+   As required   : 374 mm2
+   Bars provided : 2 - 16mm phi  (As=402mm2)
+   Stirrups      : 10mm phi @ 125mm spacing
+
+6. COLUMN DESIGN
+----------------------------------------
+   [Critical Interior Column]
+   Size          : 300mm x 300mm
+   Pu (factored) : 359.0 kN
+   As required   : 900 mm2
+   rho required  : 0.0100
+   Bars provided : 4 - 20mm phi  (As=1257mm2)
+   rho provided  : 0.0140  (min=0.01, max=0.06)
+   Lateral ties  : 10mm phi @ 300mm
+
+   [Corner Column]
+   Size          : 300mm x 300mm
+   Pu (factored) : 85.5 kN
+   As required   : 900 mm2
+   rho required  : 0.0100
+   Bars provided : 4 - 20mm phi  (As=1257mm2)
+   rho provided  : 0.0140  (min=0.01, max=0.06)
+   Lateral ties  : 10mm phi @ 300mm
+
+7. FOOTING DESIGN
+----------------------------------------
+   q_allowable : 150.0 kN/m2
+   Depth NGL   : 1.5 m
+   [Interior Footing (Max Load)]
+   Service load  : 269.7 kN
+   Footing size  : 1.45m x 1.45m (square)
+   Total depth h : 350mm
+   eff. depth d  : 250mm
+   qu (net)      : 169.31 kN/m2
+   Vu punch      : 304.8 kN  (phi*Vc=720.3kN) OK
+   As bottom     : 1197mm2  ->  6-16mm phi ea way
+   Bar spacing   : 260mm c/c (each direction)
+
+   [Corner Footing (Min Load)]
+   Service load  : 65.5 kN
+   Footing size  : 0.70m x 0.70m (square)
+   Total depth h : 350mm
+   eff. depth d  : 250mm
+   qu (net)      : 176.44 kN/m2
+   Vu punch      : 33.1 kN  (phi*Vc=720.3kN) OK
+   As bottom     : 578mm2  ->  5-16mm phi ea way
+   Bar spacing   : 140mm c/c (each direction)
+
+8. STAIR DESIGN DATA
+----------------------------------------
+   Number of risers   : 18
+   Riser height       : 166.7mm  (code: 100-200mm)
+   Tread width        : 280mm  (code: >= 250mm)
+   Stair angle        : 30.8 deg  (code: <= 45 deg)
+   Stair width        : 1200mm  (code: >= 900mm)
+   Horizontal span    : 5.04m
+   Waist slab t       : 150mm
+   Landing length     : 1200mm
+
+9. NSCP 2015 CODE CHECKS
+----------------------------------------
+   [PASS]  Beam rho within limits (rho_min to rho_max)
+   [PASS]  Column rho within 1% - 6%
+   [PASS]  Footing punching shear OK
+   [PASS]  Stair riser <= 200mm
+   [PASS]  Stair tread >= 250mm
+   [PASS]  Stair angle <= 45 deg
+   [PASS]  Min column size 300x300mm
+   [PASS]  Footing depth >= 1.2m NGL
+
+======================================================================
+  END OF REPORT
+======================================================================
