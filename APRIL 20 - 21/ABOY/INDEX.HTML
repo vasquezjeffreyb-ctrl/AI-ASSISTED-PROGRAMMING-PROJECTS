@@ -1,47 +1,553 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>P-M Interaction Tool</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
-        h1 { color: #333; }
-        form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); max-width: 400px; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
-        button { margin-top: 15px; padding: 10px; background: #0078d7; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #005fa3; }
-        .result { margin-top: 30px; padding: 20px; background: #e9f5e9; border: 1px solid #c3e6c3; border-radius: 8px; }
-        .unsafe { background: #fbe9e9; border: 1px solid #f5c2c2; }
-        img { margin-top: 20px; max-width: 500px; border: 1px solid #ccc; border-radius: 8px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construction Progress Report — Housing Subdivision</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #12120f;
+    --paper: #f5f2eb;
+    --paper2: #ede9df;
+    --accent: #c8401a;
+    --gold: #c99832;
+    --blue: #1a5f96;
+    --green: #2d7a2a;
+    --border: #ccc7b8;
+    --muted: #7a756a;
+    --red: #c0392b;
+    --orange: #d68910;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: A4 portrait; margin: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #e8e4da;
+    color: var(--ink);
+    padding: 20px 0 40px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* ── INPUT PANEL ── */
+  .input-panel {
+    width: 210mm;
+    margin: 0 auto 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 14px 20px 12px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .input-panel-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-bottom: 8px;
+  }
+  .input-fields { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; align-items: flex-end; }
+  .input-group { display: flex; flex-direction: column; gap: 4px; }
+  .input-group label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: .1em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .lred    { color: var(--red) !important; }
+  .lorange { color: var(--orange) !important; }
+  .lblue   { color: var(--blue) !important; }
+  .lgreen  { color: var(--green) !important; }
+  .input-group input[type="number"] {
+    width: 70px; padding: 6px 8px;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    color: var(--ink); background: var(--paper); text-align: center;
+    outline: none; -moz-appearance: textfield;
+    transition: border-color .15s;
+  }
+  .input-group input::-webkit-inner-spin-button,
+  .input-group input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .input-group input:focus { border-color: var(--ink); background: #fff; }
+  .input-group input.inp-red:focus    { border-color: var(--red); }
+  .input-group input.inp-orange:focus { border-color: var(--orange); }
+  .input-group input.inp-blue:focus   { border-color: var(--blue); }
+  .input-group input.inp-green:focus  { border-color: var(--green); }
+  .side-controls { display: flex; flex-direction: column; gap: 6px; align-self: flex-end; }
+  .error-msg {
+    font-family: 'DM Mono', monospace; font-size: 8.5px;
+    color: var(--red); letter-spacing: .04em; min-height: 13px;
+  }
+  .bottom-row { display: flex; gap: 8px; align-items: center; }
+  .total-display {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--muted); white-space: nowrap;
+    padding: 6px 10px; background: var(--paper2);
+    border-radius: 3px; border: 1px solid var(--border);
+  }
+  .total-display strong { color: var(--ink); }
+  .btn-update {
+    padding: 7px 18px; background: var(--ink); color: var(--paper);
+    border: none; border-radius: 3px;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    cursor: pointer; transition: background .15s;
+  }
+  .btn-update:hover { background: #333; }
+  .btn-update:active { transform: scale(.98); }
+
+  @media print {
+    body { background: none; padding: 0; }
+    .input-panel { display: none; }
+  }
+
+  /* ── PAGE ── */
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto; background: var(--paper); overflow: hidden; }
+
+  /* ── HEADER ── */
+  .header-band {
+    background: var(--ink); color: var(--paper);
+    padding: 22px 32px 18px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .project-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .18em; text-transform: uppercase; color: #999; margin-bottom: 4px;
+  }
+  .project-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 36px;
+    letter-spacing: .04em; line-height: 1; color: var(--paper);
+  }
+  .project-title span { color: var(--gold); }
+  .report-meta {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: #aaa; line-height: 1.9; letter-spacing: .05em; text-align: right;
+  }
+  .accent-rule { height: 4px; background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 40%, var(--blue) 70%, var(--green) 100%); }
+  .body-wrap { padding: 22px 32px 20px; }
+
+  /* ── KPI ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-card { border: 1px solid var(--border); border-top: 3px solid var(--ink); padding: 12px 14px 10px; background: #fff; }
+  .kpi-card.c-red    { border-top-color: var(--red); }
+  .kpi-card.c-orange { border-top-color: var(--orange); }
+  .kpi-card.c-blue   { border-top-color: var(--blue); }
+  .kpi-card.c-green  { border-top-color: var(--green); }
+  .kpi-label { font-size: 9px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .kpi-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: .02em; line-height: 1; }
+  .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  /* ── TWO COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1.45fr; gap: 16px; margin-bottom: 18px; }
+  .section-title {
+    font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;
+  }
+
+  /* ── STAGES ── */
+  .stage-list { display: flex; flex-direction: column; gap: 10px; }
+  .stage-item { display: grid; grid-template-columns: 46px 1fr; gap: 10px; align-items: start; }
+  .stage-pct { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: .02em; line-height: 1; text-align: center; }
+  .s25  .stage-pct { color: var(--red); }
+  .s50  .stage-pct { color: var(--orange); }
+  .s75  .stage-pct { color: var(--blue); }
+  .s100 .stage-pct { color: var(--green); }
+  .stage-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+  .stage-desc { font-size: 9.5px; color: var(--muted); line-height: 1.55; }
+
+  /* ── TABLE ── */
+  table.prog { width: 100%; border-collapse: collapse; font-size: 10px; }
+  table.prog thead tr { background: var(--ink); color: var(--paper); }
+  table.prog th {
+    padding: 7px 10px; font-family: 'DM Mono', monospace; font-weight: 400;
+    font-size: 9px; letter-spacing: .08em; text-transform: uppercase; text-align: left;
+  }
+  table.prog th:last-child, table.prog td:last-child { text-align: right; }
+  table.prog th:nth-child(3), table.prog td:nth-child(3) { text-align: center; }
+  table.prog td {
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+    vertical-align: middle; color: var(--ink); line-height: 1.45;
+  }
+  table.prog tr:last-child td { border-bottom: none; background: var(--paper2); font-weight: 600; }
+  table.prog tbody tr:nth-child(even) td { background: #faf8f4; }
+  .pill {
+    display: inline-block; font-family: 'DM Mono', monospace;
+    font-size: 9px; font-weight: 500; padding: 2px 9px;
+    border-radius: 20px; letter-spacing: .04em;
+  }
+  .pill-red    { background: #fbe9e7; color: #922b21; border: 1px solid #f5c6c6; }
+  .pill-orange { background: #fef3da; color: #7d4d06; border: 1px solid #f9d89b; }
+  .pill-blue   { background: #dbeafe; color: #1a3e6e; border: 1px solid #93c5fd; }
+  .pill-green  { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+  .bar-bg { background: var(--paper2); border-radius: 3px; height: 6px; width: 80px; display: inline-block; vertical-align: middle; }
+  .bar-fill { height: 6px; border-radius: 3px; transition: width .4s ease; }
+
+  /* ── HOUSE GRID ── */
+  .grid-section { margin-bottom: 14px; }
+  .house-grid-wrap { border: 1px solid var(--border); background: #fff; padding: 10px 12px; }
+  .house-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+  .house-grid svg { display: block; }
+  .legend-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .legend-item strong { color: var(--ink); font-weight: 600; }
+
+  /* ── DONUT ── */
+  .donut-wrap { display: flex; align-items: center; gap: 14px; padding: 10px 0 4px; }
+  .donut-legend { font-size: 9.5px; color: var(--muted); line-height: 2; }
+  .donut-legend span { color: var(--ink); font-weight: 600; }
+
+  /* ── FOOTER ── */
+  .footer-band {
+    background: var(--ink); color: #888;
+    padding: 10px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: .05em;
+  }
+  .footer-band strong { color: var(--paper); }
+</style>
 </head>
 <body>
-    <h1>P-M Interaction Tool</h1>
-    <form method="POST">
-        <label>Width b (mm)</label>
-        <input type="number" step="0.01" name="b" required>
-        <label>Height h (mm)</label>
-        <input type="number" step="0.01" name="h" required>
-        <label>Concrete strength fc (MPa)</label>
-        <input type="number" step="0.01" name="fc" required>
-        <label>Steel yield strength fy (MPa)</label>
-        <input type="number" step="0.01" name="fy" required>
-        <label>Axial Load Pu (kN)</label>
-        <input type="number" step="0.01" name="Pu" required>
-        <label>Moment Mu (kN·m)</label>
-        <input type="number" step="0.01" name="Mu" required>
-        <button type="submit">Analyze</button>
-    </form>
 
-    {% if result %}
-    <div class="result {% if result.status == 'UNSAFE' %}unsafe{% endif %}">
-        <h2>Results</h2>
-        <p><strong>φPn:</strong> {{ result.phiPn }} kN</p>
-        <p><strong>φMn:</strong> {{ result.phiMn }} kN·m</p>
-        <p><strong>Status:</strong> {{ result.status }}</p>
-        <img src="{{ url_for('static', filename='diagram.png') }}" alt="Interaction Diagram">
+<!-- ═══ INPUT PANEL ═══ -->
+<div class="input-panel">
+  <div class="input-panel-title">&#9998;&nbsp; Edit Unit Count</div>
+  <div class="input-fields">
+    <div class="input-group">
+      <label class="lred">25% — Foundation</label>
+      <input type="number" id="in25" class="inp-red" value="12" min="0" max="99999">
     </div>
-    {% endif %}
+    <div class="input-group">
+      <label class="lorange">50% — Walling</label>
+      <input type="number" id="in50" class="inp-orange" value="20" min="0" max="99999">
+    </div>
+    <div class="input-group">
+      <label class="lblue">75% — Roofing</label>
+      <input type="number" id="in75" class="inp-blue" value="28" min="0" max="99999">
+    </div>
+    <div class="input-group">
+      <label class="lgreen">100% — Completed</label>
+      <input type="number" id="in100" class="inp-green" value="40" min="0" max="99999">
+    </div>
+  </div>
+  <div class="side-controls">
+    <div class="error-msg" id="errMsg"></div>
+    <div class="bottom-row">
+      <div class="total-display">Total: <strong id="totalDisp">100</strong> units</div>
+      <button class="btn-update" onclick="applyUpdate()">Update Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE ═══ -->
+<div class="page">
+
+  <div class="header-band">
+    <div>
+      <div class="project-label">Engineering Progress Report &nbsp;/&nbsp; Housing Subdivision Project</div>
+      <div class="project-title">Construction <span>Progress</span></div>
+    </div>
+    <div class="report-meta">
+      REPORT DATE: APRIL 21, 2026<br>
+      PROJECT CODE: HSP-2026-001<br>
+      TOTAL UNITS: <span id="hdrTotal">100</span><br>
+      OVERALL COMPLETION: <span id="hdrPct">68%</span>
+    </div>
+  </div>
+  <div class="accent-rule"></div>
+
+  <div class="body-wrap">
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card c-red">
+        <div class="kpi-label">25% — Foundation</div>
+        <div class="kpi-val" style="color:var(--red)" id="kpi25">12</div>
+        <div class="kpi-sub">Units at foundation stage</div>
+      </div>
+      <div class="kpi-card c-orange">
+        <div class="kpi-label">50% — Walling</div>
+        <div class="kpi-val" style="color:var(--orange)" id="kpi50">20</div>
+        <div class="kpi-sub">Units with walls &amp; partial roof</div>
+      </div>
+      <div class="kpi-card c-blue">
+        <div class="kpi-label">75% — Roofing &amp; Rough-ins</div>
+        <div class="kpi-val" style="color:var(--blue)" id="kpi75">28</div>
+        <div class="kpi-sub">Units near completion</div>
+      </div>
+      <div class="kpi-card c-green">
+        <div class="kpi-label">100% — Turnover Ready</div>
+        <div class="kpi-val" style="color:var(--green)" id="kpi100">40</div>
+        <div class="kpi-sub">Fully completed units</div>
+      </div>
+    </div>
+
+    <!-- TWO COL -->
+    <div class="two-col">
+      <div>
+        <div class="section-title">Stage Descriptions</div>
+        <div class="stage-list">
+          <div class="stage-item s25">
+            <div class="stage-pct">25%</div>
+            <div class="stage-body">
+              <div class="stage-name">Foundation &amp; Initial Structural Works</div>
+              <div class="stage-desc">Site clearing, earthworks, and footing excavation complete. Concrete foundation slabs poured and fully cured. Column stubs and starter bars installed. Ready for structural framing.</div>
+            </div>
+          </div>
+          <div class="stage-item s50">
+            <div class="stage-pct">50%</div>
+            <div class="stage-body">
+              <div class="stage-name">Walling &amp; Partial Roofing</div>
+              <div class="stage-desc">Masonry walls completed to lintel level. Door and window rough openings formed. Partial roof framing erected. Structural integrity inspections passed.</div>
+            </div>
+          </div>
+          <div class="stage-item s75">
+            <div class="stage-pct">75%</div>
+            <div class="stage-body">
+              <div class="stage-name">Complete Roofing, Plastering &amp; Rough-ins</div>
+              <div class="stage-desc">Full roofing system with rafters, purlins, and sheets installed. External plastering complete. Rough-in works for electrical, plumbing, and mechanical sleeves finished.</div>
+            </div>
+          </div>
+          <div class="stage-item s100">
+            <div class="stage-pct">100%</div>
+            <div class="stage-body">
+              <div class="stage-name">Fully Completed &amp; Ready for Turnover</div>
+              <div class="stage-desc">All finishing works done — tiling, painting, fixtures, electrical connections, and plumbing installed. Final inspections cleared. Units ready for client acceptance.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Tabulated Progress Summary</div>
+        <table class="prog">
+          <thead>
+            <tr>
+              <th>Progress</th>
+              <th>Description of Work Completed</th>
+              <th>Units</th>
+              <th>Distribution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pill pill-red">25%</span></td>
+              <td>Foundation, earthworks, concrete slab, column stubs</td>
+              <td style="text-align:center;font-weight:600" id="td25">12</td>
+              <td>
+                <div class="bar-bg"><div class="bar-fill" id="bar25" style="width:12%;background:var(--red);"></div></div>
+                &nbsp;<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)" id="pct25">12%</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-orange">50%</span></td>
+              <td>Masonry walls, rough openings, partial roof framing</td>
+              <td style="text-align:center;font-weight:600" id="td50">20</td>
+              <td>
+                <div class="bar-bg"><div class="bar-fill" id="bar50" style="width:20%;background:var(--orange);"></div></div>
+                &nbsp;<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)" id="pct50">20%</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-blue">75%</span></td>
+              <td>Full roofing, external plastering, electrical &amp; plumbing rough-ins</td>
+              <td style="text-align:center;font-weight:600" id="td75">28</td>
+              <td>
+                <div class="bar-bg"><div class="bar-fill" id="bar75" style="width:28%;background:var(--blue);"></div></div>
+                &nbsp;<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)" id="pct75">28%</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-green">100%</span></td>
+              <td>All finishing, fixtures, final inspections, turnover-ready</td>
+              <td style="text-align:center;font-weight:600" id="td100">40</td>
+              <td>
+                <div class="bar-bg"><div class="bar-fill" id="bar100" style="width:40%;background:var(--green);"></div></div>
+                &nbsp;<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)" id="pct100">40%</span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em">TOTAL UNITS</td>
+              <td style="text-align:center" id="tdTotal">100</td>
+              <td>
+                <div class="bar-bg"><div class="bar-fill" style="width:100%;background:var(--ink);"></div></div>
+                &nbsp;<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">100%</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top:14px;">
+          <div class="section-title">Overall Weighted Completion</div>
+          <div class="donut-wrap">
+            <svg width="76" height="76" viewBox="0 0 76 76" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="38" cy="38" r="28" fill="none" stroke="#ede9df" stroke-width="13"/>
+              <circle cx="38" cy="38" r="28" fill="none" stroke="#2d7a2a" stroke-width="13" id="dGreen"
+                stroke-dasharray="70.4 105.5" stroke-dashoffset="0" transform="rotate(-90 38 38)"/>
+              <circle cx="38" cy="38" r="28" fill="none" stroke="#1a5f96" stroke-width="13" id="dBlue"
+                stroke-dasharray="49.3 126.6" stroke-dashoffset="-70.4" transform="rotate(-90 38 38)"/>
+              <circle cx="38" cy="38" r="28" fill="none" stroke="#d68910" stroke-width="13" id="dOrange"
+                stroke-dasharray="35.2 140.7" stroke-dashoffset="-119.7" transform="rotate(-90 38 38)"/>
+              <circle cx="38" cy="38" r="28" fill="none" stroke="#c0392b" stroke-width="13" id="dRed"
+                stroke-dasharray="21.1 154.8" stroke-dashoffset="-154.9" transform="rotate(-90 38 38)"/>
+              <text x="38" y="42" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="16" fill="#12120f" id="donutPct">68%</text>
+            </svg>
+            <div class="donut-legend">
+              <div>Foundation (25%) &nbsp;<span id="dl25">12 units / 12%</span></div>
+              <div>Walling (50%) &nbsp;<span id="dl50">20 units / 20%</span></div>
+              <div>Roofing &amp; Rough-ins (75%) &nbsp;<span id="dl75">28 units / 28%</span></div>
+              <div>Completed (100%) &nbsp;<span id="dl100">40 units / 40%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOUSE GRID -->
+    <div class="grid-section">
+      <div class="section-title" id="gridTitle">Subdivision Layout — Color-Coded Unit Status (100 Units)</div>
+      <div class="house-grid-wrap">
+        <div class="house-grid" id="houseGrid"></div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>25% Foundation &nbsp;<strong id="leg25">12 units</strong></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>50% Walling &amp; Partial Roofing &nbsp;<strong id="leg50">20 units</strong></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>75% Roofing &amp; Rough-ins &nbsp;<strong id="leg75">28 units</strong></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>100% Fully Completed &nbsp;<strong id="leg100">40 units</strong></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-band">
+    <div>Prepared by: <strong>Project Engineering Team</strong> &nbsp;|&nbsp; HSP-2026-001</div>
+    <div>Report Date: <strong>April 21, 2026</strong> &nbsp;|&nbsp; Page 1 of 1</div>
+  </div>
+</div>
+
+<script>
+const C = 175.93;
+
+function getVals() {
+  return {
+    v25:  Math.max(0, parseInt(document.getElementById('in25').value)  || 0),
+    v50:  Math.max(0, parseInt(document.getElementById('in50').value)  || 0),
+    v75:  Math.max(0, parseInt(document.getElementById('in75').value)  || 0),
+    v100: Math.max(0, parseInt(document.getElementById('in100').value) || 0),
+  };
+}
+
+['in25','in50','in75','in100'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const { v25, v50, v75, v100 } = getVals();
+    document.getElementById('totalDisp').textContent = v25 + v50 + v75 + v100;
+    document.getElementById('errMsg').textContent = '';
+  });
+});
+
+function buildGrid(v25, v50, v75, v100) {
+  const stages = [
+    { count: v100, fill: '#2d7a2a', roof: '#1d5c1b' },
+    { count: v75,  fill: '#1a5f96', roof: '#0f3d63' },
+    { count: v50,  fill: '#d68910', roof: '#9a6208' },
+    { count: v25,  fill: '#c0392b', roof: '#8e1b12' },
+  ];
+  const units = [];
+  stages.forEach(s => { for (let i = 0; i < s.count; i++) units.push(s); });
+  for (let i = units.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [units[i], units[j]] = [units[j], units[i]];
+  }
+  const grid = document.getElementById('houseGrid');
+  grid.innerHTML = '';
+  units.forEach((u, idx) => {
+    const cell = document.createElement('div');
+    cell.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" title="Unit ${idx+1}">
+      <polygon points="10,2 2,9 18,9" fill="${u.roof}"/>
+      <rect x="4" y="9" width="12" height="9" fill="${u.fill}" rx="1"/>
+      <rect x="8.5" y="13" width="3" height="5" fill="${u.roof}" rx="0.5"/>
+    </svg>`;
+    grid.appendChild(cell);
+  });
+}
+
+function updateDonut(v25, v50, v75, v100, total) {
+  const segs = [
+    { id: 'dGreen',  n: v100 },
+    { id: 'dBlue',   n: v75  },
+    { id: 'dOrange', n: v50  },
+    { id: 'dRed',    n: v25  },
+  ];
+  let offset = 0;
+  segs.forEach(s => {
+    const arc = total > 0 ? (s.n / total) * C : 0;
+    const el = document.getElementById(s.id);
+    el.setAttribute('stroke-dasharray', arc.toFixed(2) + ' ' + (C - arc).toFixed(2));
+    el.setAttribute('stroke-dashoffset', (-offset).toFixed(2));
+    offset += arc;
+  });
+}
+
+function applyUpdate() {
+  const { v25, v50, v75, v100 } = getVals();
+  const total = v25 + v50 + v75 + v100;
+  const err = document.getElementById('errMsg');
+  if (total === 0) { err.textContent = 'Enter at least one unit to update.'; return; }
+  err.textContent = '';
+
+  const wPct = Math.round((v25*0.25 + v50*0.5 + v75*0.75 + v100) / total * 100);
+  const pct  = n => Math.round(n / total * 100);
+  const p25 = pct(v25), p50 = pct(v50), p75 = pct(v75), p100 = pct(v100);
+
+  document.getElementById('hdrTotal').textContent  = total;
+  document.getElementById('hdrPct').textContent    = wPct + '%';
+
+  document.getElementById('kpi25').textContent  = v25;
+  document.getElementById('kpi50').textContent  = v50;
+  document.getElementById('kpi75').textContent  = v75;
+  document.getElementById('kpi100').textContent = v100;
+
+  document.getElementById('td25').textContent   = v25;
+  document.getElementById('td50').textContent   = v50;
+  document.getElementById('td75').textContent   = v75;
+  document.getElementById('td100').textContent  = v100;
+  document.getElementById('tdTotal').textContent = total;
+
+  document.getElementById('bar25').style.width  = p25  + '%';
+  document.getElementById('bar50').style.width  = p50  + '%';
+  document.getElementById('bar75').style.width  = p75  + '%';
+  document.getElementById('bar100').style.width = p100 + '%';
+  document.getElementById('pct25').textContent  = p25  + '%';
+  document.getElementById('pct50').textContent  = p50  + '%';
+  document.getElementById('pct75').textContent  = p75  + '%';
+  document.getElementById('pct100').textContent = p100 + '%';
+
+  document.getElementById('dl25').textContent  = v25  + ' units / ' + p25  + '%';
+  document.getElementById('dl50').textContent  = v50  + ' units / ' + p50  + '%';
+  document.getElementById('dl75').textContent  = v75  + ' units / ' + p75  + '%';
+  document.getElementById('dl100').textContent = v100 + ' units / ' + p100 + '%';
+  document.getElementById('donutPct').textContent = wPct + '%';
+
+  document.getElementById('gridTitle').textContent = 'Subdivision Layout — Color-Coded Unit Status (' + total + ' Units)';
+  document.getElementById('leg25').textContent  = v25  + ' units';
+  document.getElementById('leg50').textContent  = v50  + ' units';
+  document.getElementById('leg75').textContent  = v75  + ' units';
+  document.getElementById('leg100').textContent = v100 + ' units';
+  document.getElementById('totalDisp').textContent = total;
+
+  updateDonut(v25, v50, v75, v100, total);
+  buildGrid(v25, v50, v75, v100);
+}
+
+buildGrid(12, 20, 28, 40);
+</script>
 </body>
 </html>
