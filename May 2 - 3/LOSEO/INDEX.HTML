@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clad-Tech Architecture</title>
+    <style>
+        :root {
+            /* Material Palette */
+            --concrete: #e0e0e0;
+            --steel: #b0b3b8;
+            --wood: #a67c52;
+            --glass: rgba(255, 255, 255, 0.1);
+            --dark-panel: #2d2d2d;
+            --accent: #d4af37;
+            --text-main: #333;
+            --bg-site: #f5f5f5;
+            
+            /* Shadows for depth */
+            --shadow-panel: 0 10px 30px rgba(0,0,0,0.1);
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-site);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Hero Cladding Section --- */
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 80vh;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .hero-panel {
+            position: relative;
+            overflow: hidden;
+            background: var(--steel);
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: flex-end;
+            padding: 40px;
+            box-shadow: var(--shadow-panel);
+        }
+
+        .panel-large { grid-column: span 8; background: linear-gradient(135deg, #d1d1d1, #b8b8b8); }
+        .panel-small { grid-column: span 4; background: var(--wood); color: white; }
+
+        .hero-content {
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        /* --- Modular Grid Layout --- */
+        .facade-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .module {
+            aspect-ratio: 1 / 1.2;
+            background: white;
+            border-left: 8px solid var(--dark-panel);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .module:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            border-left-color: var(--accent);
+        }
+
+        .module::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .module:hover::after { opacity: 1; }
+
+        /* --- Material Types --- */
+        .mat-concrete { background: #ececec; border-top: 1px solid #ddd; }
+        .mat-metal { background: #333; color: #eee; }
+        
+        .tag {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            .hero-panel { grid-column: span 12; }
+            .hero-title { font-size: 2.5rem; }
+        }
+
+        /* --- Dark Mode Variation (Composite Metal) --- */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-site: #1a1a1a;
+                --text-main: #f0f0f0;
+                --dark-panel: #000;
+            }
+            .module { background: #252525; border-left-color: #444; }
+        }
+    </style>
+</head>
+<body>
+
+    <header style="padding: 30px 20px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase;">
+        Clad // Architecture
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-panel panel-large">
+                <div class="hero-content">
+                    <span class="tag">Structural Aesthetic</span>
+                    <h1 class="hero-title">Layered <br> Integrity.</h1>
+                </div>
+            </div>
+            <div class="hero-panel panel-small">
+                <p>Modern cladding systems offer thermal efficiency with a modular soul.</p>
+            </div>
+        </section>
+
+        <section class="facade-grid">
+            <div class="module mat-concrete">
+                <div>
+                    <span class="tag">Panel 01</span>
+                    <h3>Brutalist Concrete</h3>
+                </div>
+                <p>High-density fiber cement with a raw, matte finish for urban permanence.</p>
+            </div>
+
+            <div class="module mat-metal">
+                <div>
+                    <span class="tag">Panel 02</span>
+                    <h3>Zinc Composite</h3>
+                </div>
+                <p>Natural weathering steel that develops a protective patina over decades.</p>
+            </div>
+
+            <div class="module">
+                <div>
+                    <span class="tag">Panel 03</span>
+                    <h3>Terra Cotta</h3>
+                </div>
+                <p>Sustainable clay extrusions providing a warm, breathable outer skin.</p>
+            </div>
+
+            <div class="module mat-concrete">
+                <div>
+                    <span class="tag">Panel 04</span>
+                    <h3>Double Glazing</h3>
+                </div>
+                <p>Low-E glass modules optimized for maximum solar heat gain control.</p>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
